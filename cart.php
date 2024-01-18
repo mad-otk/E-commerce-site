@@ -21,36 +21,16 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-// Handle form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['Add'])) {
-        $modify_quantity = $_POST['modify_quantity'];
-        $cart_name = $_POST['cart_name'];
-
-        // Validate and update cart
-        if (!empty($user_id) && !empty($cart_name) && is_numeric($modify_quantity) && $modify_quantity > 0) {
-            // Prepare and bind the SQL statement
-            $update_query = "UPDATE cart SET quantity = quantity + ? WHERE name = ? AND id = ?";
-            $stmt = mysqli_prepare($conn, $update_query);
-
-            // Bind parameters
-            mysqli_stmt_bind_param($stmt, "iss", $modify_quantity, $cart_name, $user_id);
-
-            // Execute the statement
-            $update_result = mysqli_stmt_execute($stmt);
-
-            // Check for errors
-            if (!$update_result) {
-                echo "Error updating cart: " . mysqli_error($conn);
-            }
-
-            // Close the statement
-            mysqli_stmt_close($stmt);
-        } else {
-            echo "Invalid data submitted";
-        }
-    }
+if(isset($_POST['update_cart'])) {
+    $cart_id = $_POST['cart_id'];
+    $modify_quantity = $_POST['modify_quantity'];
+    $update_qty = mysqli_query($conn, "UPDATE cart SET quantity = '$modify_quantity' where id = '$cart_id' AND user_id='$user_id'");
+    echo "US";
 }
+
+// Handle form submission
+
+
 ?>
 
 <!DOCTYPE html>
@@ -82,11 +62,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php echo $user_id; ?>
         <a href="login.php" class="btn">Logout</a> <h1>
 
-        <?php $select_product_details = mysqli_query($conn, "SELECT cart.name as cart_name, cart.price as cart_price, cart.quantity as cart_quantity, products.image as product_image FROM products JOIN cart ON products.name = cart.name WHERE cart.user_id = '$user_id'") or die('query failed'); ?>
+        <?php $select_product_details = mysqli_query($conn, "SELECT cart.id as cart_id, cart.name as cart_name, cart.price as cart_price, cart.quantity as cart_quantity, products.image as product_image FROM products JOIN cart ON products.name = cart.name WHERE cart.user_id = '$user_id'") or die('query failed'); ?>
         <!-- TABLE DESCRIPTION -->
 
-       
-        <form method="post" action="">
     <table class="table table-sm table-light">
         <thead>
             <tr>
@@ -108,33 +86,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 while ($fetch_product_details = mysqli_fetch_assoc($select_product_details)) {
                     $imageData = base64_encode($fetch_product_details['product_image']);
                     $src = 'data:image/png;base64,' . $imageData;
+                    
                     ?>
                     <tr>
                         <td><?php echo $fetch_product_details['cart_name']; ?></td>
+
                         <td><img src="<?php echo $src; ?>" alt="Product Image"></td>
+
+                       
+
                         <td><?php echo $fetch_product_details['cart_price']; ?></td>
+
                         <td><?php echo $fetch_product_details['cart_quantity']; ?></td>
-                        <td>
-                            <input type="number" min="1" name="modify_quantity[<?php echo $fetch_product_details['cart_name']; ?>]" value="1">
-                        </td>
+
+                        <form action="" method="post">
+                            
+                        <input type="hidden" value="<?php echo $fetch_product_details['cart_id']; ?>" name="cart_id" >
+<td>
+                        <div ><input type="number" min="1" value="1" name="modify_quantity"></div>
+                        <input type="submit" value="Update Cart" name="update_cart"> </td>
+                </form>
                         <td><?php echo $fetch_product_details['cart_price'] * $fetch_product_details['cart_quantity']; ?></td>
                         <td>
-                            <input type="hidden" name="cart_name[]" value="<?php echo $fetch_product_details['cart_name']; ?>">
-                        </td>
+                        
+                        <input type="hidden" name="cart_name" value="<?php echo $fetch_product_details['cart_name']; ?>">
+                        
+                        
+                        
+                
+            </td>
                     </tr>
+                    
+
                     <?php
+                    
                 }
                 ?>
-                <!-- Hidden input field for user_id -->
-                <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
 
-                <!-- Submit buttons -->
-                <tr>
-                    <td colspan="6">
-                        <input type="submit" value="Add" name="Add" class="btn">
-                        <input type="submit" value="Remove" name="Remove" class="btn">
-                    </td>
-                </tr>
                 <?php
             } else {
                 ?>
@@ -146,5 +134,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <?php } ?>
         </tbody>
     </table>
-</form>
-            </body>
+        
+
+
+    </body>
+
+    </html>
+
+
+    
