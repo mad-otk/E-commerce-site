@@ -16,7 +16,7 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-if (isset($_GET['my_cart'])) {
+if (isset($_POST['my_cart'])) {
     header('location:cart.php');
 }
 
@@ -26,13 +26,14 @@ if (isset($_POST['add_to_cart'])) {
     $product_price = $_POST['product_price'];
     $product_quantity = $_POST['product_quantity'];
     $product_id = $_POST['product_id'];
-    
+
 
     // Product already existing for a particular user
     $select_cart = mysqli_query($conn, "SELECT * FROM cart WHERE name = '$product_name' AND user_id = '$user_id'") or die('query failed');
 
     if (mysqli_num_rows($select_cart) > 0) {
-        $message[] = 'product added already';
+        $message[] = 'Quantity updated';
+        $add_more = mysqli_query($conn, "UPDATE cart SET quantity = '$product_quantity' where id = '$product_id' AND user_id='$user_id'");
     } else {
         mysqli_query($conn, "INSERT INTO cart(id, user_id, name, price, quantity) VALUES('$product_id','$user_id','$product_name','$product_price','$product_quantity')") or die('query failed');
         $message[] = 'product added to cart';
@@ -84,7 +85,8 @@ $select_photo = mysqli_query($conn, "SELECT products.image AS product_image FROM
                 </span> </p>
 
             <div class="flex">
-                <a href="index.php?logout=<?php echo $user_id; ?>" onclick="return confirm('are you sure you want to logout');" class="delete-btn">logout </a>
+                <a href="index.php?logout=<?php echo $user_id; ?>"
+                    onclick="return confirm('are you sure you want to logout');" class="delete-btn">logout </a>
             </div>
         </div>
 
@@ -93,31 +95,37 @@ $select_photo = mysqli_query($conn, "SELECT products.image AS product_image FROM
             <div class="box-container">
                 <?php
                 while ($fetch_product = mysqli_fetch_assoc($select_product)) {
-                ?>
+                    ?>
                     <form method="post" class="box" action="">
                         <?php
                         $imageData = base64_encode($fetch_product['image']);
                         $src = 'data:image/png;base64,' . $imageData;
                         ?>
                         <img src="<?php echo $src; ?>" alt="Product Image">
-                        <div class="name"><?php echo $fetch_product['name']; ?></div>
-                        <div class="price"><?php echo "Rs " . $fetch_product['price']; ?></div>
+                        <div class="name">
+                            <?php echo $fetch_product['name']; ?>
+                        </div>
+                        <div class="price">
+                            <?php echo "Rs " . $fetch_product['price']; ?>
+                        </div>
                         <input type="number" min="1" name="product_quantity" value="1">
                         <input type="hidden" name="product_name" value="<?php echo $fetch_product['name']; ?>">
                         <input type="hidden" name="product_price" value="<?php echo $fetch_product['price']; ?>">
                         <input type="hidden" name="product_id" value="<?php echo $fetch_product['id']; ?>">
-                        <input type="submit" value="add_to_cart" name="add_to_cart" class="btn">
-                        
+                        <input type="submit" value="add_to_cart" name="add_to_cart" class="option-btn">
+
                     </form>
                 <?php } ?>
                 
-                
             </div>
+                        
         </div>
 
-                </div>
-                <a href="cart.php" class="btn" id="mc">My Cart</a>
+    </div>
+    <a href="cart.php" class = "option-btn" style= margin: 50%;>my_cart</a>
 
+
+    
 </body>
 
 </html>

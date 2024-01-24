@@ -68,6 +68,17 @@ body{
    text-transform: capitalize;
 }
 
+.option2-btn{
+   display: inline-block;
+   padding:10px 30px;
+   cursor: pointer;
+   font-size: 18px;
+   color:var(--white);
+   border-radius: 5px;
+   text-transform: capitalize;
+   margin : 10px 10px;
+}
+
 .btn:hover,
 .delete-btn:hover,
 .option-btn:hover{

@@ -50,8 +50,8 @@ if (isset($_POST['submit'])) {
             <h3>Login</h3>
             <input type="email" name="email" required placeholder="Enter email" class="box">
             <input type="password" name="password" required placeholder="Enter password" class="box">
-            <input type="submit" name="submit" class="btn" value="login now">
-            <p>Don't have an account? Register  <a href="register.php"> here</a></p>
+            <input type="submit" name="submit" class="option-btn" value="login now">
+            <p>Don't have an account? Register  <a href="register.php" class="option2-btn"> here</a></p>
         </form>
 </div>
 
